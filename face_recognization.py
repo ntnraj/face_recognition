@@ -10,7 +10,7 @@ import requests
 import uuid
 
 # Variable to track the time of the last API call
-last_api_call_time = 0
+last_api_call_times = {}
 API_ENDPOINT='http://localhost:8000/api/face_data'
 
 
@@ -142,27 +142,21 @@ if __name__ == '__main__':
             last_api_call_time = time.time()  # Update the last API call time
 
         else:
-            # If at least one recognized name, unlock the door
-            print('Door Unlocked for ' + recognized_name_temp)
-            # Speak "Door Unlocked"
-            # engine.say("Door Unlocked "+ recognized_name_temp)
             if recognized_name_temp not in known_faces:
                 api_call(recognized_name_temp)
+                last_api_call_times[recognized_name_temp] = time.time()
+                known_faces[recognized_name_temp] = True
                 print('Firing API for ' + recognized_name_temp)
-                # Update the last API call time
-                last_api_call_time = time.time()
-            else:
-                # If the recognized face is known, check if it's been at least 1 minute since the last API call
-                current_time = time.time()
-                if current_time - last_api_call_time >= 60:
-                    # Call the API here
-                    api_call(recognized_name_temp)
-                    print('Firing API for ' + recognized_name_temp)
-                    # You can use requests library to make the API call
-                    # Example: response = requests.post('https://x.optimse.com/login', data=payload)
 
-                    # Update the last API call time
-                    last_api_call_time = current_time    
+            else:
+                current_time = time.time()
+                last_api_call_time = last_api_call_times.get(recognized_name_temp, 0)
+
+                if current_time - last_api_call_time >= 60:
+                    api_call(recognized_name_temp)
+                    last_api_call_times[recognized_name_temp] = current_time
+                    print('Firing API for ' + recognized_name_temp)
+
 
         # Display the frame
         cv2.imshow('Face Recognition', frame)
