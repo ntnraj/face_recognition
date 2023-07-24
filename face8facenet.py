@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
 import os
 
+
 # Directory where the captured images are stored
 captured_images_folder = 'captured_images'
 
@@ -79,16 +80,37 @@ if __name__ == '__main__':
     # Start capturing from the device's camera
     capture = cv2.VideoCapture(0)
 
+    # Initialize the text-to-speech engine
+    # engine = pyttsx3.init()
+
+
     while True:
         ret, frame = capture.read()
 
         # Find and recognize faces in the frame
         recognized_names = recognize_faces(frame, knn_model)
+    
+        door_locked = True
+        recognized_name_temp = ''; 
 
         for recognized_name in recognized_names:
             # Display the recognized person's name
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, recognized_name, (10, 30), font, 1.0, (0, 255, 0), 2)
+            print('Door Unlocked for '+recognized_name)
+            recognized_name_temp = recognized_name
+            door_locked = False
+        
+        if door_locked:
+            # If no recognized names, lock the door
+            print('Door Locked')
+            # Speak "Door Locked"
+            # engine.say("Door Locked")
+        else:
+            # If at least one recognized name, unlock the door
+            print('Door Unlocked for ' + recognized_name_temp)
+            # Speak "Door Unlocked"
+            # engine.say("Door Unlocked "+ recognized_name_temp)
 
         # Display the frame
         cv2.imshow('Face Recognition', frame)

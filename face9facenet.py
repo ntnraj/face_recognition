@@ -1,10 +1,9 @@
-            import cv2
+import cv2
 import numpy as np
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
 import os
-import pyttsx3
 
 
 # Directory where the captured images are stored
